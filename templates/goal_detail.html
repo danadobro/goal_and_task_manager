@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ goal.title }}</title>
+</head>
+<body>
+    <h1>{{ goal.title }}</h1>
+    <p>{{ goal.description }}</p>
+    <p>Target Date: {{ goal.target_date }}</p>
+    <h2>Tasks</h2>
+    <ul>
+        {% for task in goal.tasks.all %}
+            <li>
+                {{ task.title }} ({{ task.task_type }}) - Due: {{ task.due_date }} - Completed: {{ task.completed }}
+            </li>
+        {% endfor %}
+    </ul>
+    <h2>Progress</h2>
+    <p>{{ goal.progress.last.percentage_completed }}% Completed</p>
+</body>
+</html>

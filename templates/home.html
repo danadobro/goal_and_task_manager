@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+
+<h2> Goals Overview </h2>
+<ul>
+
+    {% for goal in goals %}
+        <li>
+            <a href="{% url 'goal_detail' goal.pk %}">{{ goal.name}}</a>
+            <p>Target Date: {{ goal.target_date }}</p>
+        </li>
+    {% empty %}
+        <p>No goals set.</p>
+    {% endfor %}
+</ul>
+
+
+<a href="{% url 'new_goal' %}">Add a new goal</a>
+
+</body>
+</html>
