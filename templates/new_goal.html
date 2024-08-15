@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>new_goal</title>
+    {% load static %}
+    <link href="{% static 'dist/styles.css' %}" rel="stylesheet">
 </head>
-<body>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Create Goal</button>
-</form>
+<body class="min-h-screen bg-custom">
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4 text-center text-custom2">Create a New Goal</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+    
+            <button type="submit" class="btn bg-custom5 text-custom">Create Goal</button>
+        </form>
+</div>
 
 </body>
 </html>

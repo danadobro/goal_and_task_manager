@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
+from .views import update_task
 
 
 urlpatterns = [
@@ -24,4 +25,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path('goal/new/', views.new_goal, name="new_goal"),
     path('goal/<int:pk>/', views.goal_detail, name="goal_detail"),
+
+    path('update_task/<int:task_id>/', update_task, name='update_task'),
+
 ]

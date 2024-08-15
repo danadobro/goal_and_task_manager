@@ -2,25 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link href="{% static 'dist/styles.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/@heroicons/react/outline" defer></script>
     <title>Home</title>
 </head>
-<body>
+<body class="min-h-screen bg-custom">
 
-<h2> Goals Overview </h2>
-<ul>
+    <div class="container mx-auto p-4">
+        <h2 class="text-4xl text-custom5 font-bold mb-4 text-center">Goals Overview</h2>
+        <ul>
+            {% for goal in goals %}
+                <li class="mb-2">
+                    <a href="{% url 'goal_detail' goal.pk %}" class="text-custom3 hover:underline">{{ goal.name }}</a>
+                    <p>Target Date: {{ goal.target_date }}</p>
+                </li>
+            {% empty %}
+                <p>No goals set.</p>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'new_goal' %}" class="mt-4 inline-flex items-center justify-center bg-custom5 text-white rounded-full w-10 h-10">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg> 
+        </a>  New Goal
+    
+        <h2 class="text-4xl text-custom5 font-bold mb-4 text-center">Upcoming Tasks </h2>
+    
+        <ul>
+            {% for task in upcoming_tasks %}
+                <li class="mb-2">
+                    <a href="{% url 'goal_detail' task.goal.pk %}" class="text-custom3 hover:underline">{{ task.title }}</a>
+                    <p>Target Date: {{ task.due_date }}</p>
+                    
+                    <form method="POST" action="{% url 'update_task' task.id %}">
+                        {% csrf_token %}
+                        <input type="checkbox" name="completed" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
+                        <label>Mark as completed</label>
+                    </form>             
+                
+                </li>
+            {% empty %}
+                <p>No tasks set.</p>
+            {% endfor %}
+        </ul>
+    
+        
+        
 
-    {% for goal in goals %}
-        <li>
-            <a href="{% url 'goal_detail' goal.pk %}">{{ goal.name}}</a>
-            <p>Target Date: {{ goal.target_date }}</p>
-        </li>
-    {% empty %}
-        <p>No goals set.</p>
-    {% endfor %}
-</ul>
+    
+    </div>
 
-
-<a href="{% url 'new_goal' %}">Add a new goal</a>
 
 </body>
 </html>
+

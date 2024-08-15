@@ -1,21 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ goal.title }}</title>
+    {% load static %}
+    <link href="{% static 'dist/styles.css' %}" rel="stylesheet">
+    <title>{{ goal.name }}</title>
 </head>
-<body>
-    <h1>{{ goal.title }}</h1>
-    <p>{{ goal.description }}</p>
-    <p>Target Date: {{ goal.target_date }}</p>
-    <h2>Tasks</h2>
+<body class="min-h-screen bg-custom">
+<div class="container mx-auto p-4">
+
+    <h1 class="text-4xl text-custom5 font-bold mb-4 text-center">{{ goal.name }}</h1>
+    <p class="text-center">Target Date: {{ goal.target_date }}</p>
+    <p class="text-4xl font-bold mt-4 text-custom3"> Description: </p>
+    <div class="box-border p-4 border-custom5 border-4 ">
+        <p>{{ goal.description }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Task</button>
+    </form>
+
+    {% for task in goal.goals_tasks.all %}
+        <div>
+            <h5>{{ task.title }}</h5>
+            <p>Type: {{ task.type }}</p>
+            {% if task.due_date %}
+            <p>Due date: {{ task.due_date }}</p>
+            {% endif %}
+            <p>Completed: {{ task.completed }}</p>
+        </div>
+    {% empty %}
+        <p>No tasks for this goal yet.</p>
+    {% endfor %}
+    
+
+    <h2>Completed Tasks</h2>
     <ul>
-        {% for task in goal.tasks.all %}
+        {% for task in completed_tasks %}
             <li>
-                {{ task.title }} ({{ task.task_type }}) - Due: {{ task.due_date }} - Completed: {{ task.completed }}
+                {{ task.title }} 
             </li>
+        {% empty %}
+            <li>No completed tasks.</li>
         {% endfor %}
     </ul>
-    <h2>Progress</h2>
-    <p>{{ goal.progress.last.percentage_completed }}% Completed</p>
+    
+
+
+    <h2>Missed Tasks</h2>
+    <ul>
+        {% for task in missed_tasks %}
+            <li>
+                {{ task.title }} (Due: {{ task.due_date }})
+            </li>
+        {% empty %}
+            <li>No missed tasks.</li>
+        {% endfor %}
+    </ul>
+
+
+</div>
 </body>
 </html>
