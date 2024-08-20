@@ -3,13 +3,15 @@ from datetime import date, datetime
 from goals import models
 from goals import forms
 from task import models as task_models
-from task.models import Task
+from task.models import Task, TaskCompletion
 from goals.forms import GoalForm
-from task.forms import TaskForm, UpdateTaskForm
+from task.forms import TaskForm
 from goals.models import Goal
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
 
 def home(request):
@@ -32,8 +34,11 @@ def new_goal(request):
 
 def goal_detail(request, pk):
     goal = get_object_or_404(Goal, pk=pk)
-    missed_tasks = Task.objects.filter(goal=goal, completed=False, due_date__lt=datetime.now())
-    completed_tasks = Task.objects.filter(goal=goal, completed=True)
+    # missed_tasks = Task.objects.filter(goal=goal, completed=False, due_date__lt=datetime.now())
+    # completed_tasks = Task.objects.filter(goal=goal, completed=True)
+    daily_tasks = Task.objects.filter(goal=goal, type='d')
+    weekly_tasks = Task.objects.filter(goal=goal, type='w')
+    onetime_tasks = Task.objects.filter(goal=goal, type='one-time')
 
     if request.method == 'POST':
         form = TaskForm(request.POST)
@@ -59,16 +64,28 @@ def goal_detail(request, pk):
     context = {
         'goal': goal,
         'form': form,
-        'missed_tasks': missed_tasks,
-        'completed_tasks': completed_tasks,
+        # 'missed_tasks': missed_tasks,
+        # 'completed_tasks': completed_tasks,
+        'daily_tasks': daily_tasks,
+        'weekly_tasks': weekly_tasks,
+        'onetime_tasks': onetime_tasks,
     }
     return render(request, 'goal_detail.html', context)
 
 
-def update_task(request, task_id):
+def mark_task_complete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if request.method == 'POST':
-        form = UpdateTaskForm(request.POST, instance=task)
-        if form.is_valid():
-            form.save()
-    return redirect('home')
+        TaskCompletion.objects.create(task=task, completed_date=timezone.now().date())
+    goal_id = task.goal.id
+    return redirect('goal_detail', pk=goal_id)
+
+
+def get_completion_dates(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    completion_dates = task.completions.values_list('completed_date', flat=True)
+    # Convert datetime objects to string
+    completion_dates = [date.strftime('%Y-%m-%d') for date in completion_dates]
+    return JsonResponse({'completion_dates': completion_dates})
+
+

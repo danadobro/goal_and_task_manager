@@ -36,7 +36,7 @@
                     <a href="{% url 'goal_detail' task.goal.pk %}" class="text-custom3 hover:underline">{{ task.title }}</a>
                     <p>Target Date: {{ task.due_date }}</p>
                     
-                    <form method="POST" action="{% url 'update_task' task.id %}">
+                    <form method="POST">
                         {% csrf_token %}
                         <input type="checkbox" name="completed" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
                         <label>Mark as completed</label>

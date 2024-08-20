@@ -3,6 +3,7 @@
 <head>
     {% load static %}
     <link href="{% static 'dist/styles.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/@heroicons/react/outline" defer></script>
     <title>{{ goal.name }}</title>
 </head>
 <body class="min-h-screen bg-custom">
@@ -15,24 +16,79 @@
         <p>{{ goal.description }}</p>
     </div>
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Task</button>
-    </form>
 
-    {% for task in goal.goals_tasks.all %}
-        <div>
-            <h5>{{ task.title }}</h5>
-            <p>Type: {{ task.type }}</p>
-            {% if task.due_date %}
-            <p>Due date: {{ task.due_date }}</p>
-            {% endif %}
-            <p>Completed: {{ task.completed }}</p>
+    <div>
+        <h1 class="text-4xl text-custom3 font-bold mt-4"> Tasks </h1>
+    </div>
+    
+    <div id="taskForm" style="display:none;">
+        <form class="p-4 md:p-8 my-5 mt-2 rounded-lg shadow-2xl" method="POST">
+            <h1 class=" mb-4 text-4xl font-bold mt-4 text-custom3">New Task</h1>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Add Task</button>
+        </form>
+    </div>
+    <div class="mt-4 inline-flex items-center justify-center">
+        <div class="bg-custom5 text-white rounded-full w-10 h-10 flex items-center justify-center" id="toggleButton" onclick="toggleForm()">
+    
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
         </div>
-    {% empty %}
-        <p>No tasks for this goal yet.</p>
-    {% endfor %}
+        <span class="ml-2">Add a new task</span>
+    </div>
+
+
+<div class="flex justify-between">
+    <div class="flex-1 border-8 border-custom4 m-2 p-4">
+        <h2 class="font-bold text-xl mb-4">Daily Tasks</h2>
+        {% for task in daily_tasks %}
+            {% if task.is_completed_today %}
+                <p>{{ task.title }} completed for today.</p>
+            {% else %}
+                <form method="POST" action="{% url 'mark_task_complete' task.id %}" id="task-form-{{ task.id }}"> 
+                    {% csrf_token %}
+                    <label for="completed-task-{{ task.id }}">
+                        <input type="checkbox" name="completed" value="true" id="completed-task-{{ task.id }}" onchange="document.getElementById('task-form-{{ task.id }}').submit();"> 
+                        {{ task.title }}
+                    </label>
+                </form>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="flex-1 border-8 border-custom4 m-2 p-4">
+        <h2 class="font-bold text-xl mb-4">Weekly Tasks</h2>
+        {% for task in weekly_tasks %}
+            {% if task.is_completed_this_week %}
+                <p>{{ task.title }} completed for this week.</p>
+            {% else %}
+                <form method="POST" action="{% url 'mark_task_complete' task.id %}" id="task-form-{{ task.id }}"> 
+                    {% csrf_token %}
+                    <label for="completed-task-{{ task.id }}">
+                        <input type="checkbox" name="completed" value="true" id="completed-task-{{ task.id }}" onchange="document.getElementById('task-form-{{ task.id }}').submit();" {% if task.completed %} checked {% endif %}> 
+                        {{ task.title }}
+                    </label>
+                </form>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="flex-1 border-8 border-custom4 m-2 p-4">
+        <h2 class="font-bold text-xl mb-4">One-time Tasks</h2>
+        {% for task in onetime_tasks %}
+            <form method="POST" action="{% url 'mark_task_complete' task.id %}" id="task-form-{{ task.id }}"> 
+                {% csrf_token %}
+                <label for="completed-task-{{ task.id }}">
+                    <input type="checkbox" name="completed" value="true" id="completed-task-{{ task.id }}" onchange="document.getElementById('task-form-{{ task.id }}').submit();" {% if task.completed %} checked {% endif %}> 
+                    {{ task.title }}
+                </label>
+            </form>
+        {% endfor %}
+    </div>
+</div>
+
     
 
     <h2>Completed Tasks</h2>
@@ -59,7 +115,20 @@
         {% endfor %}
     </ul>
 
+    
+
 
 </div>
 </body>
+    <script>
+        function toggleForm() {
+            var x = document.getElementById("taskForm");
+            var btn = document.getElementById("toggleButton");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+        }
+    }
+    </script>
 </html>

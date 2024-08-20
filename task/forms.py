@@ -6,12 +6,6 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'type', 'due_date']
+        widgets = {'due_date': forms.DateInput(attrs={'type': 'date'})}
 
 
-class UpdateTaskForm(forms.ModelForm):
-    class Meta:
-        model = Task
-        fields = ['completed']
-        widgets = {
-            'completed': forms.CheckboxInput(),
-        }
