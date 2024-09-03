@@ -12,7 +12,8 @@ from datetime import timedelta
 from django.db.models import F
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 
 def home(request):
     goals = models.Goal.objects.all()  # retrieves all Goal objects from the database.
@@ -89,3 +90,17 @@ def get_completion_dates(request, task_id):
     return JsonResponse({'completion_dates': completion_dates})
 
 
+def goal_completions(request, goal_id):
+    goal_completions = TaskCompletion.objects.filter(task__goal_id=goal_id)
+    events = [
+        {
+            'title': str(completion.task),
+            'start': str(completion.completed_date.isoformat()) if completion.completed_date
+            else None,
+            'color': '#0071C5' if completion.task.type == 'd' else
+            '#008000' if completion.task.type == 'w' else
+            '#FF4500'
+        }
+        for completion in goal_completions
+    ]
+    return JsonResponse(events, safe=False)
