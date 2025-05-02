@@ -78,46 +78,43 @@
     <div class="flex-1 border-8 border-custom4 m-2 p-4">
         <h2 class="font-bold text-xl mb-4">One-time Tasks</h2>
         {% for task in onetime_tasks %}
-            <form method="POST" action="{% url 'mark_task_complete' task.id %}" id="task-form-{{ task.id }}"> 
-                {% csrf_token %}
-                <label for="completed-task-{{ task.id }}">
-                    <input type="checkbox" name="completed" value="true" id="completed-task-{{ task.id }}" onchange="document.getElementById('task-form-{{ task.id }}').submit();" {% if task.completed %} checked {% endif %}> 
-                    {{ task.title }}
-                </label>
-            </form>
+            {% if task.is_completed %}
+                <p> {{ task.title }} completed </p>
+            {% else %}
+                <form method="POST" action="{% url 'mark_task_complete' task.id %}" id="task-form-{{ task.id }}"> 
+                    {% csrf_token %}
+                    <label for="completed-task-{{ task.id }}">
+                        <input type="checkbox" name="completed" value="true" id="completed-task-{{ task.id }}" onchange="document.getElementById('task-form-{{ task.id }}').submit();" {% if task.completed %} checked {% endif %}> 
+                        {{ task.title }}
+                    </label>
+                </form>
+            {% endif %}
         {% endfor %}
     </div>
 </div>
 
-    
-
-    <h2>Completed Tasks</h2>
-    <ul>
-        {% for task in completed_tasks %}
-            <li>
-                {{ task.title }} 
-            </li>
-        {% empty %}
-            <li>No completed tasks.</li>
-        {% endfor %}
-    </ul>
-    
 
 
-    <h2>Missed Tasks</h2>
-    <ul>
-        {% for task in missed_tasks %}
-            <li>
-                {{ task.title }} (Due: {{ task.due_date }})
-            </li>
-        {% empty %}
-            <li>No missed tasks.</li>
-        {% endfor %}
-    </ul>
 
-    
+    <h2 class="text-4xl font-bold mt-4 text-custom3"> Task Completion Calendar </h2>
 
 
+
+    <div class="text-4xl font-bold mt-4 text-custom4" id='calendar'></div>
+
+ 
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: '{% url 'goal_completions' goal.id %}' 
+        });
+        calendar.render();
+    });
+</script>
 </div>
 </body>
     <script>
@@ -131,4 +128,6 @@
         }
     }
     </script>
+
+    
 </html>

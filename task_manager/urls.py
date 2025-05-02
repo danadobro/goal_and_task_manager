@@ -28,4 +28,8 @@ urlpatterns = [
 
     path('mark_task_complete/<int:task_id>/', mark_task_complete, name='mark_task_complete'),
 
+    path('goal/<int:goal_id>/completions/', views.goal_completions, name='goal_completions'),
+
+
+
 ]

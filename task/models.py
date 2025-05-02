@@ -39,6 +39,8 @@ class Task(models.Model):
 
         return TaskCompletion.objects.filter(task=self, completed_date__range=[start_of_week, end_of_week]).exists()
 
+    def is_completed(self):
+        return TaskCompletion.objects.filter(task=self, completed_date__isnull=False).exists()
 
 class TaskCompletion(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='completions')
